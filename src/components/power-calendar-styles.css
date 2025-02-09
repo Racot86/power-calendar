@@ -66,7 +66,6 @@
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
     padding: 10px;
 }
 
@@ -79,19 +78,109 @@
     padding: 10px;
     background: black;
     cursor: pointer;
-    border-radius: 3px;
     transition: 0.2s ease;
 }
 
-.day:hover {
-    background: black;
-}
+
 
 .selected {
-    background: #007bff;
-    color: white;
+    background: black;
+    color: #007bff;
 }
 
 .inactive {
     color: #ccc;
+}
+
+.start-date {
+    position: relative;
+    z-index: 1;
+    border-radius: unset;
+}
+.start-date::before {
+    content: '';
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #007bff;
+    border-radius: 50%;
+    z-index: -1;
+}
+.start-date::after {
+    content: '';
+    position: absolute;
+    top:0;
+    left:50%;
+    width: 50%;
+    height: 100%;
+    background: gray;
+
+    z-index: -2;
+}
+
+
+.end-date {
+    background: gray;
+    border-bottom-right-radius: 50%;
+    border-top-right-radius: 50%;
+    position: relative;
+    z-index: 1;
+}
+.end-date::before {
+    content: '';
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: green;
+    border-radius: 50%;
+    z-index: -1;
+}
+
+
+.range{
+    background: gray;
+}
+.path-start{
+    position: relative;
+    z-index: 1;
+}
+.path-start::before {
+    content: '';
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-left: 1px dashed orange;
+    border-top: 1px dashed orange;
+    border-bottom: 1px dashed orange;
+    border-bottom-left-radius: 50%;
+    border-top-left-radius: 50%;
+    z-index: -1;
+}
+.path-body{
+    position: relative;
+    z-index: 1;
+
+}
+.path-body::before{
+    content: '';
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-top: 1px dashed orange;
+    border-bottom: 1px dashed orange;
+    z-index: -1;
+}
+
+.path-end{
+    border-right: 1px dashed orange;
+    border-top: 1px dashed orange;
+    border-bottom: 1px dashed orange;
 }

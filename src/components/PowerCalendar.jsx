@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useRef, useState} from "react";
 import {
     format,
     startOfMonth,
@@ -10,7 +10,7 @@ import {
     setMonth,
     setYear,
     eachDayOfInterval,
-    isSameDay,
+    isSameDay, differenceInDays, setDate,
 } from "date-fns";
 import "./power-calendar-styles.css";
 
@@ -19,7 +19,8 @@ const PowerCalendar = () => {
     const [currentDate, setCurrentDate] = useState(today);
     const [viewMode, setViewMode] = useState("calendar");
     const [startDate, setStartDate] = useState(null);
-    const [endtDate, setEndDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const dayGrid = useRef(null);
 
     // **Generate Months**
     const months = [
@@ -49,6 +50,64 @@ const PowerCalendar = () => {
 
     // **Return to Today**
     const goToToday = () => setCurrentDate(today);
+
+    const onDayClick = (e) => {
+        if (!startDate && !endDate){
+            setStartDate(e)
+        }
+
+        if (!startDate && endDate){
+            setStartDate(e)
+        }
+
+        if (startDate && !endDate){
+            setEndDate(e)
+        }
+
+        if (startDate && endDate){
+            if (e===startDate || e===endDate) return
+            if (e<startDate){
+                setStartDate(e)
+            }else if(e>endDate){
+                setEndDate(e)
+            }else if(e > startDate && e<=endDate ){
+                if (differenceInDays(e,startDate)<=differenceInDays(endDate,e)){
+                    setStartDate(e)
+                }else (
+                    setEndDate(e)
+                )
+            }
+        }
+        console.log('start', startDate,'end',endDate)
+    }
+    const onDayMouseEnter = (date) => {
+        if (startDate && date<startDate){
+            const days = dayGrid.current.children
+            for (let day of days) {
+                if (!day.classList.contains("inactive")) {
+                    const cellDate = setDate(currentDate, Number(day.innerHTML));
+                    if (date.getDate()===cellDate.getDate()) {
+                        day.classList.add("path-start");
+                    }else if(cellDate.getDate()>date.getDate() && cellDate.getDate()<=startDate.getDate()){
+                        day.classList.remove("path-start");
+                        day.classList.add("path-body");
+                    }
+                }
+            }
+        }
+    }
+    const onDayMouseLeave = () => {
+        const days = dayGrid.current.children
+        for (let day of days) {
+            if (!day.classList.contains("inactive")) {
+                day.classList.remove("path-start");
+                day.classList.remove("path-body");
+                day.classList.remove("path-end");
+            }
+        }
+    }
+
+    const isInRange = (start, end,value) => value > start && value < end;
 
     // **Generate Calendar Grid (Monday Start)**
     const monthStart = startOfMonth(currentDate);
@@ -112,13 +171,21 @@ const PowerCalendar = () => {
                         </div>
 
                         {/* Calendar Days */}
-                        <div className="calendar-grid">
+                        <div ref={dayGrid} className="calendar-grid">
                             {daysArray.map((day, index) => (
                                 <div
+                                    onMouseEnter={()=>onDayMouseEnter(day)}
+                                    onMouseLeave={onDayMouseLeave}
+                                    onClick={()=>onDayClick(day)}
                                     key={index}
                                     className={`day ${
                                         isSameDay(day, today) ? "selected" : ""
-                                    } ${day.getMonth() !== monthStart.getMonth() ? "inactive" : ""}`}
+                                    } 
+                                    ${day.getMonth() !== monthStart.getMonth() ? "inactive" : ""}
+                                    ${startDate && isSameDay(day, startDate) ? "start-date" : ""}
+                                    ${endDate && isSameDay(day, endDate) ? "end-date" : ""}
+                                    ${startDate && endDate && isInRange(startDate,endDate,day) ? "range" : ""}
+                                    `}
                                 >
                                     {format(day, "d")}
                                 </div>
