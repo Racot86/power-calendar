@@ -4,13 +4,12 @@ import './App.css'
 import PowerCalendar from "./components/PowerCalendar.jsx";
 
 function App() {
-    const [selectedDate, setSelectedDate] = useState(null);
-
+    const [dates, setDates] = useState([new Date(),null]);
     return (
         <div>
             <h1>React Calendar</h1>
-            <PowerCalendar onSelectDate={setSelectedDate} />
-            {selectedDate && <p>Selected Date: {selectedDate.toDateString()}</p>}
+            <PowerCalendar onChange={setDates} />
+            <p> {dates[0] && dates[0].toDateString()}-{dates[1] && dates[1].toDateString()}</p>
         </div>
     );
 }
