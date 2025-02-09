@@ -18,6 +18,8 @@ const PowerCalendar = () => {
     const today = new Date(); // Store today's date
     const [currentDate, setCurrentDate] = useState(today);
     const [viewMode, setViewMode] = useState("calendar");
+    const [startDate, setStartDate] = useState(null);
+    const [endtDate, setEndDate] = useState(null);
 
     // **Generate Months**
     const months = [
