@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {
     format,
     startOfMonth,
@@ -10,7 +10,8 @@ import {
     setMonth,
     setYear,
     eachDayOfInterval,
-    isSameDay, differenceInDays, setDate,
+    isSameDay,
+    differenceInDays,
 } from "date-fns";
 import "./power-calendar-styles.css";
 
@@ -52,60 +53,45 @@ const PowerCalendar = () => {
     const goToToday = () => setCurrentDate(today);
 
     const onDayClick = (e) => {
-        if (!startDate && !endDate){
-            setStartDate(e)
-        }
-
-        if (!startDate && endDate){
-            setStartDate(e)
-        }
-
-        if (startDate && !endDate){
-            setEndDate(e)
-        }
-
-        if (startDate && endDate){
-            if (e===startDate || e===endDate) return
-            if (e<startDate){
+        if (e.getMonth() === currentDate.getMonth()){
+            if (!startDate && !endDate) {
                 setStartDate(e)
-            }else if(e>endDate){
-                setEndDate(e)
-            }else if(e > startDate && e<=endDate ){
-                if (differenceInDays(e,startDate)<=differenceInDays(endDate,e)){
-                    setStartDate(e)
-                }else (
-                    setEndDate(e)
-                )
             }
-        }
-        console.log('start', startDate,'end',endDate)
-    }
-    const onDayMouseEnter = (date) => {
-        if (startDate && date<startDate){
-            const days = dayGrid.current.children
-            for (let day of days) {
-                if (!day.classList.contains("inactive")) {
-                    const cellDate = setDate(currentDate, Number(day.innerHTML));
-                    if (date.getDate()===cellDate.getDate()) {
-                        day.classList.add("path-start");
-                    }else if(cellDate.getDate()>date.getDate() && cellDate.getDate()<=startDate.getDate()){
-                        day.classList.remove("path-start");
-                        day.classList.add("path-body");
-                    }
+
+            if (startDate && !endDate) {
+                if (e.getDate()<startDate.getDate()){
+                    setEndDate(startDate)
+                    setStartDate(e)
+                }else if(e.getDate() !== startDate.getDate()){
+                    setEndDate(e)
+                }
+
+            }
+
+            if (startDate && endDate) {
+
+                if (e.getDate() === startDate.getDate() || e.getDate() === endDate.getDate()) {
+
+                    setStartDate(e)
+                    setEndDate(null)
+                    return
+                }
+                if (e < startDate) {
+                    setStartDate(e)
+                } else if (e > endDate) {
+                    setEndDate(e)
+                } else if (e > startDate && e <= endDate) {
+                    if (differenceInDays(e, startDate) <= differenceInDays(endDate, e)) {
+                        setStartDate(e)
+                    } else (
+                        setEndDate(e)
+                    )
                 }
             }
         }
     }
-    const onDayMouseLeave = () => {
-        const days = dayGrid.current.children
-        for (let day of days) {
-            if (!day.classList.contains("inactive")) {
-                day.classList.remove("path-start");
-                day.classList.remove("path-body");
-                day.classList.remove("path-end");
-            }
-        }
-    }
+
+
 
     const isInRange = (start, end,value) => value > start && value < end;
 
@@ -174,8 +160,6 @@ const PowerCalendar = () => {
                         <div ref={dayGrid} className="calendar-grid">
                             {daysArray.map((day, index) => (
                                 <div
-                                    onMouseEnter={()=>onDayMouseEnter(day)}
-                                    onMouseLeave={onDayMouseLeave}
                                     onClick={()=>onDayClick(day)}
                                     key={index}
                                     className={`day ${
