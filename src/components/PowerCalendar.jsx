@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     format,
     startOfMonth,
@@ -11,27 +11,28 @@ import {
     setYear,
     eachDayOfInterval,
     isSameDay,
-    differenceInDays,
+    differenceInDays, getMonth,
 } from "date-fns";
 import "./power-calendar-styles.css";
 
-const PowerCalendar = () => {
+const PowerCalendar = ({value = [null, null], onChange}) => {
     const today = new Date(); // Store today's date
     const [currentDate, setCurrentDate] = useState(today);
     const [viewMode, setViewMode] = useState("calendar");
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [startDate, setStartDate] = useState(value[0]);
+    const [endDate, setEndDate] = useState(value[1]);
     const dayGrid = useRef(null);
 
     // **Generate Months**
     const months = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
+        "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
     ];
+    const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
     // **Generate Years Dynamically**
     const currentYear = currentDate.getFullYear();
-    const years = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
+    const years = Array.from({ length: 12 }, (_, i) => currentYear - 6 + i);
 
     // **Change Month**
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -71,10 +72,8 @@ const PowerCalendar = () => {
             if (startDate && endDate) {
 
                 if (e.getDate() === startDate.getDate() || e.getDate() === endDate.getDate()) {
-
                     setStartDate(e)
                     setEndDate(null)
-                    return
                 }
                 if (e < startDate) {
                     setStartDate(e)
@@ -90,7 +89,7 @@ const PowerCalendar = () => {
             }
         }
     }
-
+    useEffect(() => {onChange([startDate, endDate]);},[startDate, endDate]);
 
 
     const isInRange = (start, end,value) => value > start && value < end;
@@ -106,18 +105,17 @@ const PowerCalendar = () => {
         <div className="power-calendar">
             {/* Header Controls */}
             <div className="calendar-header">
-                {viewMode === "calendar" && <button onClick={prevMonth}>‹</button>}
-
                 {/* Clickable Month & Year (Dynamic Overlay Switching) */}
                 <div
                     className="header-text"
                     onClick={() => setViewMode(viewMode === "calendar" ? "month" : "year")}
                 >
-                    {viewMode === "calendar" ? format(currentDate, "MMMM yyyy") :
-                        viewMode === "month" ? format(currentDate, "yyyy") : "Select Year"}
+                    {viewMode === "calendar" ? months[getMonth(currentDate)] + " " + format(currentDate, "yyyy") :
+                        viewMode === "month" ? format(currentDate, "yyyy") : ""}
                 </div>
-
-                {viewMode === "calendar" && <button onClick={nextMonth}>›</button>}
+                {viewMode === "calendar" && <button className='btn' onClick={prevMonth}>‹</button>}
+                {viewMode === "calendar" &&<button className="btn" onClick={goToToday}>Today</button>}
+                {viewMode === "calendar"  && <button className='btn' onClick={nextMonth}>›</button>}
             </div>
 
             {/* **Fixed-Size Content Wrapper (Prevents Jumping)** */}
@@ -149,7 +147,7 @@ const PowerCalendar = () => {
                     <>
                         {/* Weekday Headers (Monday Start) */}
                         <div className="calendar-weekdays">
-                            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                            {weekdays.map((day) => (
                                 <div key={day} className="weekday">
                                     {day}
                                 </div>
@@ -167,6 +165,7 @@ const PowerCalendar = () => {
                                     } 
                                     ${day.getMonth() !== monthStart.getMonth() ? "inactive" : ""}
                                     ${startDate && isSameDay(day, startDate) ? "start-date" : ""}
+                                    ${startDate && !endDate  ? "" : " start-date-back"}
                                     ${endDate && isSameDay(day, endDate) ? "end-date" : ""}
                                     ${startDate && endDate && isInRange(startDate,endDate,day) ? "range" : ""}
                                     `}
@@ -177,11 +176,6 @@ const PowerCalendar = () => {
                         </div>
                     </>
                 )}
-            </div>
-
-            {/* **Today Button** */}
-            <div className="calendar-footer">
-                <button className="today-button" onClick={goToToday}>Today</button>
             </div>
         </div>
     );

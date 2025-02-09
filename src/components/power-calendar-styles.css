@@ -1,14 +1,14 @@
 .power-calendar {
-    width: 320px;
+    max-width: 450px;
     font-family: Arial, sans-serif;
     text-align: center;
     position: relative;
     background: white;
     padding: 10px;
     border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     color: black;
-    height: 442px;
+    min-height: 250px;
 }
 
 /* Header */
@@ -57,7 +57,8 @@
 
 .month-option:hover,
 .year-option:hover {
-    color: #007bff;
+    color: #2034E2;
+    cursor: pointer;
 }
 
 /* **Weekdays & Calendar Grid** */
@@ -77,15 +78,21 @@
 }
 
 .day {
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    aspect-ratio: 1 / 1;
+    width: 100%;
     cursor: pointer;
+    transition: 0.3s color ease-in-out;
 }
 
 
 
 .selected {
-
-    color: gray;
+    color: #2034E2;
+    font-weight: bold;
 }
 
 .inactive {
@@ -93,40 +100,40 @@
 }
 
 .start-date {
+    color: white;
     position: relative;
     z-index: 1;
 }
-.start-date::before {
+
+.start-date::after {
     content: '';
     position: absolute;
     top:0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #007bff;
+    background: #2034E2;
     border-radius: 50%;
     z-index: -1;
 }
-.start-date::after {
+
+.start-date-back::before {
     content: '';
     position: absolute;
     top:5%;
     left:50%;
     width: 50%;
     height: 90%;
-    background: gray;
-
+    background: #DBEBFF;
     z-index: -2;
 }
 
-
 .end-date {
-    background: gray;
-    border-bottom-right-radius: 50%;
-    border-top-right-radius: 50%;
+    color: white;
     position: relative;
     z-index: 1;
 }
+
 .end-date::before {
     content: '';
     position: absolute;
@@ -134,18 +141,28 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: green;
+    background: #2034E2;
     border-radius: 50%;
     z-index: -1;
 }
-
+.end-date::after {
+    content: '';
+    position: absolute;
+    top:5%;
+    left: 0;
+    width: 50%;
+    height: 90%;
+    background: #DBEBFF;
+    z-index: -2;
+}
 
 .range{
     position: relative;
     background: unset;
     z-index: 1;
 }
-.range::before {
+
+.range::after {
     content: '';
     position: absolute;
     top:5%;
@@ -155,3 +172,11 @@
     background: #DBEBFF;
     z-index: -1;
 }
+.btn{
+    background: inherit;
+    color: black;
+    outline: none;
+    border: none;
+}
+
+
