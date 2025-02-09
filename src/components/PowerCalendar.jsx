@@ -14,9 +14,9 @@ import {
 } from "date-fns";
 import "./power-calendar-styles.css";
 
-const PowerCalendar = ({ onSelectDate }) => {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(null);
+const PowerCalendar = () => {
+    const today = new Date(); // Store today's date
+    const [currentDate, setCurrentDate] = useState(today);
     const [viewMode, setViewMode] = useState("calendar");
 
     // **Generate Months**
@@ -45,19 +45,15 @@ const PowerCalendar = ({ onSelectDate }) => {
         setViewMode("month");
     };
 
+    // **Return to Today**
+    const goToToday = () => setCurrentDate(today);
+
     // **Generate Calendar Grid (Monday Start)**
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
     const weekStart = startOfWeek(monthStart, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
     const daysArray = eachDayOfInterval({ start: weekStart, end: weekEnd });
-
-    // **Handle Date Selection**
-    const handleDateClick = (day) => {
-        setSelectedDate(day);
-        onSelectDate?.(day);
-        setCurrentDate(day);
-    };
 
     return (
         <div className="power-calendar">
@@ -118,10 +114,9 @@ const PowerCalendar = ({ onSelectDate }) => {
                             {daysArray.map((day, index) => (
                                 <div
                                     key={index}
-                                    className={`day ${isSameDay(day, selectedDate) ? "selected" : ""} ${
-                                        day.getMonth() !== monthStart.getMonth() ? "inactive" : ""
-                                    }`}
-                                    onClick={() => handleDateClick(day)}
+                                    className={`day ${
+                                        isSameDay(day, today) ? "selected" : ""
+                                    } ${day.getMonth() !== monthStart.getMonth() ? "inactive" : ""}`}
                                 >
                                     {format(day, "d")}
                                 </div>
@@ -129,6 +124,11 @@ const PowerCalendar = ({ onSelectDate }) => {
                         </div>
                     </>
                 )}
+            </div>
+
+            {/* **Today Button** */}
+            <div className="calendar-footer">
+                <button className="today-button" onClick={goToToday}>Today</button>
             </div>
         </div>
     );
