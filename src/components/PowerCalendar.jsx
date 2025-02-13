@@ -23,68 +23,50 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
     const [endDate, setEndDate] = useState(value[1]);
     const dayGrid = useRef(null);
 
-    // **Generate Months**
     const months = [
         "Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень",
         "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"
     ];
     const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
-    // **Generate Years Dynamically**
     const currentYear = currentDate.getFullYear();
     const years = Array.from({ length: 12 }, (_, i) => currentYear - 6 + i);
 
-    // **Change Month**
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
-    // **Handle Month Selection**
     const handleMonthClick = (index) => {
         setCurrentDate(setMonth(currentDate, index));
         setViewMode("calendar");
     };
 
-    // **Handle Year Selection**
     const handleYearClick = (year) => {
         setCurrentDate(setYear(currentDate, year));
         setViewMode("month");
     };
 
-    // **Return to Today**
     const goToToday = () => setCurrentDate(today);
 
     const onDayClick = (e) => {
         if (e.getMonth() === currentDate.getMonth()){
-            if (!startDate && !endDate) {
+            if (!startDate){
                 setStartDate(e)
-            }
-
-            if (startDate && !endDate) {
-                if (e.getDate()<startDate.getDate()){
-                    setEndDate(startDate)
-                    setStartDate(e)
-                }else if(e.getDate() !== startDate.getDate()){
-                    setEndDate(e)
-                }
-
-            }
-
-            if (startDate && endDate) {
-
-                if (e.getDate() === startDate.getDate() || e.getDate() === endDate.getDate()) {
-                    setStartDate(e)
-                    setEndDate(null)
-                }
-                if (e < startDate) {
-                    setStartDate(e)
-                } else if (e > endDate) {
-                    setEndDate(e)
-                } else if (e > startDate && e <= endDate) {
-                    if (differenceInDays(e, startDate) <= differenceInDays(endDate, e)) {
+            }else{
+                if(!endDate){
+                    if(e.getDate()<startDate.getDate()){
                         setStartDate(e)
-                    } else (
+                    }else if(e.getDate()> startDate.getDate()){
                         setEndDate(e)
-                    )
+                    }
+                }else {
+                    if (e.getDate()>startDate.getDate() && e.getDate()<endDate.getDate()){
+                        if(differenceInDays(e,startDate)<=differenceInDays(endDate,e)){
+                            setStartDate(e)
+                        }else setEndDate(e)
+                    }else{
+                        setStartDate(e)
+                        setEndDate(null)
+                    }
                 }
             }
         }
@@ -94,7 +76,6 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
 
     const isInRange = (start, end,value) => value > start && value < end;
 
-    // **Generate Calendar Grid (Monday Start)**
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
     const weekStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -103,9 +84,7 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
 
     return (
         <div className="power-calendar">
-            {/* Header Controls */}
             <div className="calendar-header">
-                {/* Clickable Month & Year (Dynamic Overlay Switching) */}
                 <div
                     className="header-text"
                     onClick={() => setViewMode(viewMode === "calendar" ? "month" : "year")}
@@ -118,9 +97,9 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
                 {viewMode === "calendar"  && <button className='btn' onClick={nextMonth}>›</button>}
             </div>
 
-            {/* **Fixed-Size Content Wrapper (Prevents Jumping)** */}
+
             <div className="calendar-body">
-                {/* **View Mode: Year Selection** */}
+
                 {viewMode === "year" && (
                     <div className="year-select">
                         {years.map((year) => (
@@ -131,7 +110,7 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
                     </div>
                 )}
 
-                {/* **View Mode: Month Selection** */}
+
                 {viewMode === "month" && (
                     <div className="month-select">
                         {months.map((month, index) => (
@@ -142,10 +121,10 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
                     </div>
                 )}
 
-                {/* **View Mode: Calendar** */}
+
                 {viewMode === "calendar" && (
                     <>
-                        {/* Weekday Headers (Monday Start) */}
+
                         <div className="calendar-weekdays">
                             {weekdays.map((day) => (
                                 <div key={day} className="weekday">
@@ -154,7 +133,7 @@ const PowerCalendar = ({value = [null, null], onChange}) => {
                             ))}
                         </div>
 
-                        {/* Calendar Days */}
+
                         <div ref={dayGrid} className="calendar-grid">
                             {daysArray.map((day, index) => (
                                 <div
